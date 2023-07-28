@@ -274,18 +274,20 @@ sg.Button.click_ai = click_ai
 
 
 ai_win_count = 0
-num_games = 25
-play_new_game(10, 10, 10)
+NUM_GAMES = 10
 
-# Uncomment the following code to run the AI analytics, and COMMENT out "play_new_game(10, 10, 10)" above
 
 #returns the percent of games that the ai wins at that difficulty
-"""def ai_analy_runner(width, height, mines):
-    total = num_games
-    for i in range(num_games):
+def ai_analy_runner(width, height, mines):
+    total = NUM_GAMES
+    for i in range(NUM_GAMES):
         play_new_game(width, height, mines, True)
     return ai_win_count / total * 100
 
-print(ai_analy_runner(16, 16, 35))"""
+if __name__ == "__main__":
+    #play_new_game(10, 10, 10)
+    # Uncomment the below code to run the AI analytics, and comment out "play_new_game(10, 10, 10)" above
+    win_percent = ai_analy_runner(16, 16, 35)
+    print(f"The AI won {win_percent}% of games at the specified difficulty")
 
 
