@@ -1,5 +1,7 @@
 import PySimpleGUI as sg
 import random
+import sys
+
 class GameState:
     def __init__(self, width, height, mines, is_ai, ai_analysis):
         self.running = True
@@ -117,7 +119,7 @@ class GameState:
                 square.disable()
 
     def replay(self):
-        global ai_win_count, num_games
+        global ai_win_count, NUM_GAMES
         self.disable_all()
         self.running = False
     
@@ -127,8 +129,8 @@ class GameState:
         else:
             self.multi_purpose_button.update(f'You lost!', button_color='Red')
         self.play_again_button.update(disabled=False, visible=True)
-        if num_games > 0:
-            num_games -=1
+        if NUM_GAMES > 0:
+            NUM_GAMES -=1
         self.play_again_reader()
 
     def play_again_reader(self):
@@ -159,7 +161,7 @@ def play_new_game(def_w=10, def_h=10, def_mine=10, ai_analysis = False):
     first_window = sg.Window('Minesweeper', layout)
     input_list = ['width_input', 'height_input', 'mine_input']
 
-    if ai_analysis and num_games > 0:
+    if ai_analysis and NUM_GAMES > 0:
         new_game = GameState(def_w, def_h, def_mine, True, True)
         first_window.close()
         new_game.play_game()
@@ -189,7 +191,7 @@ def verify(values):
             return False
     return True
 
-#Couldn't extend Button class so just added methods and changed right click response
+#Couldn't extend Button class so overrode methods
 def disable(self):
     self.update(disabled = True)
 
@@ -285,9 +287,14 @@ def ai_analy_runner(width, height, mines):
     return ai_win_count / total * 100
 
 if __name__ == "__main__":
-    #play_new_game(10, 10, 10)
-    # Uncomment the below code to run the AI analytics, and comment out "play_new_game(10, 10, 10)" above
-    win_percent = ai_analy_runner(16, 16, 35)
-    print(f"The AI won {win_percent}% of games at the specified difficulty")
-
-
+    try:
+        arg1 = sys.argv[1]
+        if sys.argv[1] == 'normal':
+            play_new_game(10, 10, 10)
+        elif sys.argv[1] == 'analysis':
+            win_percent = ai_analy_runner(16, 16, 10)
+            print(f"The AI won {win_percent}% of games at the specified difficulty")
+        else:
+            raise Exception()
+    except:
+        print("Error: provide 'normal' or 'analysis' as a command line argument")
