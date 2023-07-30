@@ -119,7 +119,7 @@ class GameState:
                 square.disable()
 
     def replay(self):
-        global ai_win_count, NUM_GAMES
+        global ai_win_count, num_games
         self.disable_all()
         self.running = False
     
@@ -129,8 +129,8 @@ class GameState:
         else:
             self.multi_purpose_button.update(f'You lost!', button_color='Red')
         self.play_again_button.update(disabled=False, visible=True)
-        if NUM_GAMES > 0:
-            NUM_GAMES -=1
+        if num_games > 0:
+            num_games -=1
         self.play_again_reader()
 
     def play_again_reader(self):
@@ -161,7 +161,7 @@ def play_new_game(def_w=10, def_h=10, def_mine=10, ai_analysis = False):
     first_window = sg.Window('Minesweeper', layout)
     input_list = ['width_input', 'height_input', 'mine_input']
 
-    if ai_analysis and NUM_GAMES > 0:
+    if ai_analysis and num_games > 0:
         new_game = GameState(def_w, def_h, def_mine, True, True)
         first_window.close()
         new_game.play_game()
@@ -276,25 +276,34 @@ sg.Button.click_ai = click_ai
 
 
 ai_win_count = 0
-NUM_GAMES = 10
+num_games = 0
 
 
 #returns the percent of games that the ai wins at that difficulty
-def ai_analy_runner(width, height, mines):
-    total = NUM_GAMES
-    for i in range(NUM_GAMES):
+def ai_analy_runner(width, height, mines, game_num):
+    global num_games
+    num_games = game_num
+    total = num_games
+    for _ in range(num_games):
         play_new_game(width, height, mines, True)
     return ai_win_count / total * 100
 
 if __name__ == "__main__":
-    try:
-        arg1 = sys.argv[1]
-        if sys.argv[1] == 'normal':
-            play_new_game(10, 10, 10)
-        elif sys.argv[1] == 'analysis':
-            win_percent = ai_analy_runner(16, 16, 10)
-            print(f"The AI won {win_percent}% of games at the specified difficulty")
-        else:
-            raise Exception()
-    except:
-        print("Error: provide 'normal' or 'analysis' as a command line argument")
+    bad_args_exception = Exception("Provide *normal* OR *analysis <width> <height> <mine_count> <num_games>* as command line arguments")
+
+    if len(sys.argv) == 1:
+        raise bad_args_exception
+
+    arg1 = sys.argv[1]
+    if sys.argv[1] == 'normal':
+        play_new_game(10, 10, 10)
+    elif sys.argv[1] == 'analysis':
+        try:
+            width = int(sys.argv[2])
+            height = int(sys.argv[3])
+            mines = int(sys.argv[4])
+            game_num = int(sys.argv[5])
+        except (IndexError, ValueError):
+            raise bad_args_exception
+        win_percent = ai_analy_runner(width, height, mines, game_num)
+        print(f"The AI won {win_percent}% of {game_num} games on a {width}x{height} board with {mines} mines")
